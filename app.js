@@ -20,6 +20,7 @@ const companyRouter = require("./routes/companyRoutes");
 const userRouter = require("./routes/userRoutes");
 const questRouter = require("./routes/questRoutes");
 const guildRouter = require("./routes/guildRoutes");
+const contractRouter = require("./routes/contractRoutes");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
 EXPRESS APP
@@ -144,6 +145,7 @@ app.use("/api/v1/companies", companyRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/quests", questRouter);
 app.use("/api/v1/guilds", guildRouter);
+app.use("/api/v1/contracts", contractRouter);
 
 /* MIDDLEWARE FOR ALL OTHER UNHANDLED ROUTES */
 app.all("*", (req, res, next) =>{

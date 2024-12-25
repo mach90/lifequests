@@ -6,44 +6,32 @@ const slugify = require("slugify");
 const validator = require("validator");
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-QUEST SCHEMA
+GUILD SCHEMA
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-const questSchema = new mongoose.Schema(
+const guildSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: [true, "A quest must have a name."],
+            required: [true, "A guild must have a name."],
             unique: true,
             trim: true,
-            maxlength: [40, "A quest name must have less or equal then 40 characters."],
-            minlength: [3, "A quest name must have more or equal then 3 characters."],
+            maxlength: [40, "A guild name must have less or equal then 40 characters."],
+            minlength: [3, "A guild name must have more or equal then 3 characters."],
         },
         slug: String,
-        duration: {
-            type: Number,
-            required: [true, "A quest must have a duration."]
-        },
-        difficulty: {
-            type: String,
-            required: [true, "A quest must have a difficulty level."],
-            enum: { //only for strings
-                values: ["easy", "medium", "difficult"],
-                message: "Difficulty is either: easy, medium, difficult."
-            }
-        },
         summary: {
             type: String,
             trim: true,
-            required: [true, "A quest must have a summary."]
+            required: [true, "A guild must have a summary."]
         },
         description: {
             type: String,
             trim: true,
-            required: [true, "A quest must have a description."]
+            required: [true, "A guild must have a description."]
         },
         imageCover: {
             type: String,
-            required: [true, "A quest must have a cover image."]
+            required: [true, "A guild must have a cover image."]
         },
         images: [String],
         createdAt: {
@@ -51,24 +39,11 @@ const questSchema = new mongoose.Schema(
             default: Date.now(),
             select: false
         },
-        reward: {
-            type: Number,
-            required: [true, "A quest must have a reward."],
-            default: 1000,
-            min: [500, "Reward must be at least 500."],
-            max: [200000, "Reward must not exceed 200000."], 
-        },
-        experience: {
-            type: Number,
-            required: [true, "A quest must give some experience."],
-            min: [100, "Experience gained must be above 100."],
-            max: [200000, "Experience gained must be below 200000."],
-        },
-        guilds: [{
+        company: {
             type: mongoose.Schema.ObjectId,
-            ref: "Guild",
-            required: [true, "A quest must belong to at least one guild."]
-        }],
+            ref: "Company",
+            required: [true, "A guild must belong to a company."]
+        },
     },
     {
         toJSON: { virtuals: true },
@@ -79,29 +54,41 @@ const questSchema = new mongoose.Schema(
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 INDEXES. 1 = ascending, -1 = descending
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-questSchema.index({
+guildSchema.index({
     slug: 1
 });
-questSchema.index({ guilds: 1 });
-questSchema.index({ guilds: 1, difficulty: 1 });
-questSchema.index({ guilds: 1, duration: 1 });
-questSchema.index({ guilds: 1, reward: 1 });
-questSchema.index({ guilds: 1, experience: 1 });
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+VIRTUAL POPULATE
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+guildSchema.virtual("quests", {
+    ref: "Quest",
+    foreignField: "guilds",
+    localField: "_id"
+});
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 MIDDLEWARE
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-questSchema.pre("save", function(next) { 
+guildSchema.pre("save", function(next) { 
     this.slug = slugify(this.name, { lower: true });
     next();
 }); 
 
+guildSchema.pre(/^find/, function(next){
+    this.populate({
+        path: "company",
+        select: "name"
+    });
+    next();
+});
+
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-QUEST MODEL
+GUILD MODEL
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-const Quest = mongoose.model("Quest", questSchema);
+const Guild = mongoose.model("Guild", guildSchema);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 EXPORTS
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-module.exports = Quest;
+module.exports = Guild;

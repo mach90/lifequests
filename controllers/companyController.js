@@ -3,7 +3,7 @@ REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const multer = require("multer");
 const sharp = require("sharp");
-const Quest = require("./../models/questModel");
+const Company = require("./../models/companyModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
@@ -13,7 +13,7 @@ MIDDLEWARES
 ████████████████████████████████████████████████████████████████████████████████████████████████████ 
 */
 /* //////////////////////////////////////////////////
-MULTER TO UPLOAD QUESTS IMAGES
+MULTER TO UPLOAD COMPANY IMAGES
 ////////////////////////////////////////////////// */
 const multerStorage = multer.memoryStorage();
 
@@ -30,32 +30,32 @@ const multerUpload = multer({
     fileFilter: multerFilter
 });
 
-exports.uploadQuestImages = multerUpload.fields([
+exports.uploadCompanyImages = multerUpload.fields([
     {name: 'imageCover', maxCount: 1},
     {name: 'images', maxCount: 3}
 ]);
 
-exports.resizeQuestImages = catchAsync(async (req, res, next) => {
+exports.resizeCompanyImages = catchAsync(async (req, res, next) => {
     if(req.files.imageCover) {
-        req.body.imageCover = `quest-${req.params.id}-${Date.now()}-cover.jpeg`;
+        req.body.imageCover = `company-${req.params.id}-${Date.now()}-cover.jpeg`;
         await sharp(req.files.imageCover[0].buffer)
             .resize(2000, 1333)
             .toFormat("jpeg")
             .jpeg({quality: 90})
-            .toFile(`public/img/quests/${req.body.imageCover}`);
+            .toFile(`public/img/companies/${req.body.imageCover}`);
     };
 
     if(req.files.images) {
         req.body.images = [];
         await Promise.all(
             req.files.images.map(async (file, i) => {
-                const filename = `quest-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+                const filename = `company-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
 
                 await sharp(file.buffer)
                     .resize(2000, 1333)
                     .toFormat("jpeg")
                     .jpeg({quality: 90})
-                    .toFile(`public/img/quests/${filename}`);
+                    .toFile(`public/img/companies/${filename}`);
 
                 req.body.images.push(filename);
             })
@@ -66,29 +66,29 @@ exports.resizeQuestImages = catchAsync(async (req, res, next) => {
 });
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
-QUESTS ROUTE HANDLERS
+COMPANIES ROUTE HANDLERS
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-GET ALL QUESTS
+GET ALL COMPANIES
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.getAllQuests = factory.getAll(Quest);
+exports.getAllCompanies = factory.getAll(Company);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-GET QUEST BY ID
+GET COMPANY BY ID
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.getQuest = factory.getOne(Quest);
+exports.getCompany = factory.getOne(Company);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-CREATE NEW QUEST
+CREATE NEW COMPANY
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.createQuest = factory.createOne(Quest);
+exports.createCompany = factory.createOne(Company);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-PATCH QUEST (need ID)
+PATCH COMPANY (need ID)
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.patchQuest = factory.patchOne(Quest);
+exports.patchCompany = factory.patchOne(Company);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-DELETE QUEST (need id)
+DELETE COMPANY (need id)
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.deleteQuest = factory.deleteOne(Quest);
+exports.deleteCompany = factory.deleteOne(Company);

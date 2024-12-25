@@ -3,6 +3,7 @@ REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const multer = require("multer");
 const sharp = require("sharp");
+const Guild = require("./../models/guildModel");
 const Quest = require("./../models/questModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
@@ -13,7 +14,7 @@ MIDDLEWARES
 ████████████████████████████████████████████████████████████████████████████████████████████████████ 
 */
 /* //////////////////////////////////////////////////
-MULTER TO UPLOAD QUESTS IMAGES
+MULTER TO UPLOAD GUILD IMAGES
 ////////////////////////////////////////////////// */
 const multerStorage = multer.memoryStorage();
 
@@ -30,32 +31,32 @@ const multerUpload = multer({
     fileFilter: multerFilter
 });
 
-exports.uploadQuestImages = multerUpload.fields([
-    {name: 'imageCover', maxCount: 1},
-    {name: 'images', maxCount: 3}
+exports.uploadGuildImages = multerUpload.fields([
+    {name: "imageCover", maxCount: 1},
+    {name: "images", maxCount: 3}
 ]);
 
-exports.resizeQuestImages = catchAsync(async (req, res, next) => {
+exports.resizeGuildImages = catchAsync(async (req, res, next) => {
     if(req.files.imageCover) {
-        req.body.imageCover = `quest-${req.params.id}-${Date.now()}-cover.jpeg`;
+        req.body.imageCover = `guild-${req.params.id}-${Date.now()}-cover.jpeg`;
         await sharp(req.files.imageCover[0].buffer)
             .resize(2000, 1333)
             .toFormat("jpeg")
             .jpeg({quality: 90})
-            .toFile(`public/img/quests/${req.body.imageCover}`);
+            .toFile(`public/img/guilds/${req.body.imageCover}`);
     };
 
     if(req.files.images) {
         req.body.images = [];
         await Promise.all(
             req.files.images.map(async (file, i) => {
-                const filename = `quest-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+                const filename = `guild-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
 
                 await sharp(file.buffer)
                     .resize(2000, 1333)
                     .toFormat("jpeg")
                     .jpeg({quality: 90})
-                    .toFile(`public/img/quests/${filename}`);
+                    .toFile(`public/img/guilds/${filename}`);
 
                 req.body.images.push(filename);
             })
@@ -66,29 +67,59 @@ exports.resizeQuestImages = catchAsync(async (req, res, next) => {
 });
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
-QUESTS ROUTE HANDLERS
+GUILDS ROUTE HANDLERS
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-GET ALL QUESTS
+GET ALL GUILDS
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.getAllQuests = factory.getAll(Quest);
+exports.getAllGuilds = factory.getAll(Guild);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-GET QUEST BY ID
+GET GUILD BY ID
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.getQuest = factory.getOne(Quest);
+exports.getGuild = factory.getOne(Guild);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-CREATE NEW QUEST
+CREATE NEW GUILD
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.createQuest = factory.createOne(Quest);
+exports.createGuild = factory.createOne(Guild);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-PATCH QUEST (need ID)
+PATCH GUILD (need ID)
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.patchQuest = factory.patchOne(Quest);
+exports.patchGuild = factory.patchOne(Guild);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-DELETE QUEST (need id)
+DELETE GUILD (need id)
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.deleteQuest = factory.deleteOne(Quest);
+exports.deleteGuild = factory.deleteOne(Guild);
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+GET GUILD'S QUESTS
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.getAllGuildQuests = catchAsync(async (req, res, next) => {
+    const guild = await Guild.findById(req.params.id);
+
+    if (!guild) {
+        return next(new AppError("No guild found with that ID", 404));
+    }
+
+    const query = Quest.find({ guilds: req.params.id });
+
+    // // Add any filters from req.query
+    // // Add sorting if needed
+    // if (req.query.sort) {
+    //     const sortBy = req.query.sort.split(",").join(" ");
+    //     query.sort(sortBy);
+    // }
+
+    const quests = await query;
+
+    res.status(200).json({
+        status: "success",
+        results: quests.length,
+        data: {
+            quests
+        }
+    });
+});

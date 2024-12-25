@@ -16,8 +16,10 @@ const cors = require("cors"); //npm i cors
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 
+const companyRouter = require("./routes/companyRoutes");
 const userRouter = require("./routes/userRoutes");
 const questRouter = require("./routes/questRoutes");
+const guildRouter = require("./routes/guildRoutes");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
 EXPRESS APP
@@ -138,8 +140,10 @@ app.use((req, res, next) => {
 ROUTES
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 /* API ROUTES */
+app.use("/api/v1/companies", companyRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/quests", questRouter);
+app.use("/api/v1/guilds", guildRouter);
 
 /* MIDDLEWARE FOR ALL OTHER UNHANDLED ROUTES */
 app.all("*", (req, res, next) =>{

@@ -2,7 +2,8 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const Progress = require("./../models/progressModel");
-// const catchAsync = require("./../utils/catchAsync");
+const Guild = require("./../models/guildModel");
+const catchAsync = require("./../utils/catchAsync");
 // const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
 
@@ -33,3 +34,21 @@ exports.patchProgress = factory.patchOne(Progress);
 DELETE PROGRESS
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
 exports.deleteProgress = factory.deleteOne(Progress);
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+GET MY PROGRESS
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.getMyProgress = catchAsync(async (req, res, next) => {
+    const progress = await Progress.find({user: req.user.id});
+
+    const guildIds = progress.map(el => el.guild);
+    //select all the tours that id is in tourIds array
+    const guilds = await Guild.find({_id: {$in: guildIds}}); 
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            data: guilds,
+        },
+    });
+});

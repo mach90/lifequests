@@ -2,7 +2,8 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const express = require("express");
-const {getAllProgress, createProgress, getProgress, patchProgress, deleteProgress} = require("../controllers/progressController");
+const {getAllProgress, createProgress, getProgress, patchProgress, deleteProgress, getMyProgress} = require("../controllers/progressController");
+const {getMe} = require("../controllers/userController");
 const {protect, restrictTo} = require("../controllers/authController");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
@@ -13,6 +14,9 @@ const router = express.Router();
 router.route("/")
     .get(protect, restrictTo("admin"), getAllProgress)
     .post(protect, restrictTo("admin"), createProgress);
+
+router.route("/my-progress")
+    .get(protect, restrictTo("admin"), getMe, getMyProgress); //for development only, user will use frontent to get their progress
 
 router.route("/:id")
     .get(protect, restrictTo("admin"), getProgress)

@@ -2,7 +2,8 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const Contract = require("./../models/contractModel");
-// const catchAsync = require("./../utils/catchAsync");
+const Quest = require("./../models/questModel");
+const catchAsync = require("./../utils/catchAsync");
 // const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
 
@@ -33,3 +34,21 @@ exports.patchContract = factory.patchOne(Contract);
 DELETE CONTRACT
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
 exports.deleteContract = factory.deleteOne(Contract);
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+GET MY CONTRACTS
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.getMyContracts = catchAsync(async (req, res, next) => {
+    const contracts = await Contract.find({user: req.user.id});
+
+    const questIds = contracts.map(el => el.quest);
+    //select all the tours that id is in tourIds array
+    const quests = await Quest.find({_id: {$in: questIds}}); 
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            data: quests,
+        },
+    });
+});

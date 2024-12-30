@@ -4,32 +4,36 @@ REQUIRE
 const mongoose = require("mongoose");
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-CONTRACT SCHEMA
+PROGRESS SCHEMA
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-const contractSchema = new mongoose.Schema(
+const progressSchema = new mongoose.Schema(
     {
-        quest: {
+        guild: {
             type: mongoose.Schema.ObjectId,
-            ref: "Quest",
-            required: [true, "A contract must belong to a quest."]
+            ref: "Guild",
+            required: [true, "A guild progress must belong to a guild."]
         },
         user: {
             type: mongoose.Schema.ObjectId,
             ref: "User",
-            required: [true, "A contract must belong to a user."]
+            required: [true, "A guild progress must belong to a user."]
         },
         createdAt: {
             type: Date,
             default: Date.now()
         },
-        status: {
-            type: String,
-            required: [true, "A contract must have a status."],
-            enum: {
-                values: ["active", "finished"],
-                message: "Status is either: active, finished."
-            }
-        }
+        experience: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 999999999,
+        },
+        level: {
+            type: Number,
+            default: 1,
+            min:1,
+            max:200,
+        },
     },
     {
         toJSON: { virtuals: true },
@@ -40,33 +44,29 @@ const contractSchema = new mongoose.Schema(
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 INDEXES. 1 = ascending, -1 = descending
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-contractSchema.index({ user: 1, quest: 1 }, { unique: true });
-contractSchema.index({ user: 1, createdAt: -1 });
-contractSchema.index({ quest: 1, status: 1 });
-contractSchema.index({ status: 1, createdAt: -1 });
-contractSchema.index({ user: 1, status: 1, createdAt: -1 });
+progressSchema.index({ user: 1, guild: 1 }, { unique: true });
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 MIDDLEWARE
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-contractSchema.pre(/^find/, function(next){
+progressSchema.pre(/^find/, function(next){
     this.populate({
         path: "user",
         select: "name"
     }).populate({
-        path: "quest",
+        path: "guild",
         select: "name"
     });
     next();
 })
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-CONTRACT MODEL
+PROGRESS MODEL
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-const Contract = mongoose.model("Contract", contractSchema);
+const Progress = mongoose.model("Progress", progressSchema);
 
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 EXPORTS
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-module.exports = Contract;
+module.exports = Progress;

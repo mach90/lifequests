@@ -37,12 +37,94 @@ const userSchema = new mongoose.Schema(
         level: {
             type: Number,
             default: 1,
+            min:1,
+            max:200,
         },
         experience: {
             type: Number,
             default: 0,
+            min: 0,
+            max: 999999999,
         },
-        
+        attributes: {
+            strength: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            stamina: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            dexterity: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            speed: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            vitality: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            agility: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            intelligence: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            charisma: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            wisdom: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            perception: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            focus: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+            willpower: {
+                type: Number,
+                default: 0,
+                min: 0,
+                max: 255
+            },
+        },
+        money: {
+            type: Number,
+                default: 0,
+                min: 0,
+        },
         password: {
             type: String,
             required: [true, "Please choose a password."],
@@ -69,7 +151,12 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
             select: false
-        }
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now(),
+            select: false
+        },
     }
 );
 

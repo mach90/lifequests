@@ -52,17 +52,93 @@ const questSchema = new mongoose.Schema(
             select: false
         },
         reward: {
-            type: Number,
-            required: [true, "A quest must have a reward."],
-            default: 1000,
-            min: [500, "Reward must be at least 500."],
-            max: [200000, "Reward must not exceed 200000."], 
-        },
-        experience: {
-            type: Number,
-            required: [true, "A quest must give some experience."],
-            min: [100, "Experience gained must be above 100."],
-            max: [200000, "Experience gained must be below 200000."],
+            money: {
+                type: Number,
+                required: [true, "A quest must have a reward."],
+                default: 1000,
+                min: [500, "Reward must be at least 500."],
+                max: [200000, "Reward must not exceed 200000."], 
+            },
+            experience: {
+                type: Number,
+                required: [true, "A quest must give some global/guild experience."],
+                min: [100, "Global/guild experience gained must be above 100."],
+                max: [200000, "Global/guild experience gained must be below 200000."],
+            },
+            attributes: {
+                strength: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                stamina: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                dexterity: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                speed: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                vitality: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                agility: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                intelligence: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                charisma: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                wisdom: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                perception: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                focus: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+                willpower: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                    max: 10
+                },
+            },
         },
         guilds: [{
             type: mongoose.Schema.ObjectId,
@@ -71,7 +147,7 @@ const questSchema = new mongoose.Schema(
         }],
     },
     {
-        toJSON: { virtuals: true },
+        toJSON: { virtuals: true }, 
         toObject: { virtuals: true }
     }
 );

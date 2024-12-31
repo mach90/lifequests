@@ -16,7 +16,7 @@ router.route("/")
     .post(protect, restrictTo("admin"), createContract);
 
 router.route("/my-contracts")
-    .get(protect, restrictTo("admin"), getMe, getMyContracts); //for development only, user will use frontent to get their contracts
+    .get(protect, restrictTo("admin", "user"), getMe, getMyContracts); //for development only, user will use frontent to get their contracts
 
 router.route("/:id")
     .get(protect, restrictTo("admin"), getContract)

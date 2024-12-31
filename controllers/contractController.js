@@ -4,6 +4,7 @@ REQUIRE
 const Contract = require("./../models/contractModel");
 const Quest = require("./../models/questModel");
 const catchAsync = require("./../utils/catchAsync");
+const APIFeatures = require("./../utils/apiFeatures");
 // const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
 
@@ -39,16 +40,15 @@ exports.deleteContract = factory.deleteOne(Contract);
 GET MY CONTRACTS
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
 exports.getMyContracts = catchAsync(async (req, res, next) => {
-    const contracts = await Contract.find({user: req.user.id});
-
-    const questIds = contracts.map(el => el.quest);
-    //select all the tours that id is in tourIds array
-    const quests = await Quest.find({_id: {$in: questIds}}); 
-
+    const baseQuery = Contract.find({ user: req.user.id });
+    const features = new APIFeatures(baseQuery, req.query).filter().sort().limitFields().paginate();
+    const contracts = await features.query;
+    
     res.status(200).json({
         status: "success",
+        results: contracts.length,
         data: {
-            data: quests,
+            data: contracts,
         },
     });
 });

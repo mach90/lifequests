@@ -16,7 +16,7 @@ router.route("/")
     .post(protect, restrictTo("admin"), createProgress);
 
 router.route("/my-progress")
-    .get(protect, restrictTo("admin"), getMe, getMyProgress); //for development only, user will use frontent to get their progress
+    .get(protect, restrictTo("admin", "user"), getMe, getMyProgress); //for development only, user will use frontent to get their progress
 
 router.route("/:id")
     .get(protect, restrictTo("admin"), getProgress)

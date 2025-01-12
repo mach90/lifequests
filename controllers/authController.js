@@ -23,7 +23,7 @@ const createSendToken = (user, statusCode, res) => {
 
     const cookieOptions = {
         expires: new Date(Date.now()+ process.env.JWT_COOKIE_EXPIRES_IN * 24 * 3600 * 1000),
-        // secure: true, //cookie sent only on encrypted connection HTTPS
+        secure: true, //cookie sent only on encrypted connection HTTPS
         httpOnly: true, //cookie can't be accessed or modified by the browser (xss attacks)
     }
     

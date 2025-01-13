@@ -156,6 +156,13 @@ app.use("/api/v1/guilds", guildRouter);
 app.use("/api/v1/contracts", contractRouter);
 app.use("/api/v1/progress", progressRouter);
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Welcome to LifeQuests API"
+  });
+});
+
 /* MIDDLEWARE FOR ALL OTHER UNHANDLED ROUTES */
 app.all("*", (req, res, next) =>{
     next(new AppError(`Can't find ${req.originalUrl} on this server...`, 404));

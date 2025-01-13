@@ -22,10 +22,14 @@ const createSendToken = (user, statusCode, res) => {
     const token = signToken(user._id);
 
     const cookieOptions = {
-        expires: new Date(Date.now()+ process.env.JWT_COOKIE_EXPIRES_IN * 24 * 3600 * 1000),
-        secure: true, //cookie sent only on encrypted connection HTTPS
-        httpOnly: true, //cookie can't be accessed or modified by the browser (xss attacks)
-    }
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        domain: process.env.NODE_ENV === 'production' 
+          ? 'lifequests.netlify.app' 
+          : 'localhost'
+    };
     
     if(process.env.NODE_ENV === "production") cookieOptions.secure = true;
     res.cookie("jwt", token, cookieOptions);

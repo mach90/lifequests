@@ -41,7 +41,14 @@ app.use(cors({
   origin: "https://www.domainname.com"
 }));
 ////////////////////////////////////////////////// */
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://lifequests.netlify.app'
+    : 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 /* TO SERVE STATIC FILES */
 app.use(express.static(path.join(__dirname, "public")));

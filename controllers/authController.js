@@ -26,12 +26,12 @@ const createSendToken = (user, statusCode, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        domain: process.env.NODE_ENV === 'production' 
-          ? 'lifequests.netlify.app' 
-          : 'localhost'
+        // domain: process.env.NODE_ENV === 'production' 
+        //   ? 'lifequests.netlify.app' 
+        //   : 'localhost'
     };
     
-    if(process.env.NODE_ENV === "production") cookieOptions.secure = true;
+    // if(process.env.NODE_ENV === "production") cookieOptions.secure = true;
     res.cookie("jwt", token, cookieOptions);
 
     user.password = undefined; //remove the password from output
@@ -98,7 +98,9 @@ We can't modify or delete the jwt so we will send a dummy jwt that will log out 
 exports.logout = (req, res) => {
     res.cookie("jwt", "loggedout", {
         expires: new Date(Date.now() + 10 * 1000),
-        httpOnly: true
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     });
     res.status(200).json({status: "success"});
 }

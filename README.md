@@ -1,5 +1,8 @@
 # LIFEQUESTS
 
+## ⚙️ TECHNOLOGIES
+Nodejs, Express, Mongoose...
+
 ## 🔧 TO FIX
 
 ## 🔳 TO DO

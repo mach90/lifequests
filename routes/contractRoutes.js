@@ -2,7 +2,7 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const express = require("express");
-const {getAllContracts, createContract, getContract, patchContract, deleteContract, getMyContracts} = require("../controllers/contractController");
+const {getAllContracts, createContract, getContract, patchContract, deleteContract, getMyContracts, getMyContract} = require("../controllers/contractController");
 const {getMe} = require("../controllers/userController");
 const {protect, restrictTo} = require("../controllers/authController");
 
@@ -16,7 +16,10 @@ router.route("/")
     .post(protect, restrictTo("admin"), createContract);
 
 router.route("/my-contracts")
-    .get(protect, restrictTo("admin", "user"), getMe, getMyContracts); //for development only, user will use frontent to get their contracts
+    .get(protect, restrictTo("admin", "user"), getMe, getMyContracts);
+
+router.route("/my-contracts/:contractId")
+    .get(protect, restrictTo("admin", "user"), getMe, getMyContract);
 
 router.route("/:id")
     .get(protect, restrictTo("admin"), getContract)

@@ -2,10 +2,9 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const Contract = require("./../models/contractModel");
-const Quest = require("./../models/questModel");
 const catchAsync = require("./../utils/catchAsync");
 const APIFeatures = require("./../utils/apiFeatures");
-// const AppError = require("./../utils/appError");
+const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
@@ -50,5 +49,26 @@ exports.getMyContracts = catchAsync(async (req, res, next) => {
         data: {
             data: contracts,
         },
+    });
+});
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+GET MY CONTRACT BY ID
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.getMyContract = catchAsync(async (req, res, next) => {
+    const contract = await Contract.findOne({ 
+        _id: req.params.contractId,
+        user: req.user.id 
+    });
+
+    if (!contract) {
+        return next(new AppError('No contract found with that ID', 404));
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            data: contract
+        }
     });
 });

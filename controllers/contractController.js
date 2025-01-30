@@ -72,3 +72,47 @@ exports.getMyContract = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+CREATE MY CONTRACT
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.createMyContract = catchAsync(async (req, res, next) => {
+    req.body.user = req.user.id;
+
+    const newContract = await Contract.create(req.body);
+
+    res.status(201).json({
+        status: "success",
+        data: {
+            data: newContract
+        }
+    });
+});
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+PATCH MY CONTRACT
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.patchMyContract = catchAsync(async (req, res, next) => {
+    const contract = await Contract.findOneAndUpdate(
+        { 
+            _id: req.params.contractId,
+            user: req.user.id 
+        },
+        req.body,
+        {
+            new: true,
+            runValidators: true
+        }
+    );
+
+    if (!contract) {
+        return next(new AppError('No contract found with that ID', 404));
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            data: contract
+        }
+    });
+});

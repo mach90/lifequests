@@ -2,7 +2,7 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const express = require("express");
-const {getAllContracts, createContract, getContract, patchContract, deleteContract, getMyContracts, getMyContract} = require("../controllers/contractController");
+const {getAllContracts, createContract, getContract, patchContract, deleteContract, getMyContracts, getMyContract, createMyContract, patchMyContract, deleteMyContract} = require("../controllers/contractController");
 const {getMe} = require("../controllers/userController");
 const {protect, restrictTo} = require("../controllers/authController");
 
@@ -16,10 +16,13 @@ router.route("/")
     .post(protect, restrictTo("admin"), createContract);
 
 router.route("/my-contracts")
-    .get(protect, restrictTo("admin", "user"), getMe, getMyContracts);
+    .get(protect, restrictTo("admin", "user"), getMe, getMyContracts)
+    .post(protect, restrictTo("admin", "user"), getMe, createMyContract)
+    .delete(protect, restrictTo("admin", "user"), getMe, deleteMyContract)
 
 router.route("/my-contracts/:contractId")
-    .get(protect, restrictTo("admin", "user"), getMe, getMyContract);
+    .get(protect, restrictTo("admin", "user"), getMe, getMyContract)
+    .patch(protect, restrictTo("admin", "user"), getMe, patchMyContract);
 
 router.route("/:id")
     .get(protect, restrictTo("admin"), getContract)

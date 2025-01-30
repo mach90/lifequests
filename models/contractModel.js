@@ -24,6 +24,7 @@ const contractSchema = new mongoose.Schema(
         },
         status: {
             type: String,
+            default: "active",
             required: [true, "A contract must have a status."],
             enum: {
                 values: ["active", "finished"],

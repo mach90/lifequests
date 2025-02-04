@@ -40,12 +40,15 @@ GET MY CONTRACTS
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
 exports.getMyContracts = catchAsync(async (req, res, next) => {
     const baseQuery = Contract.find({ user: req.user.id });
+    const totalCount = await Contract.countDocuments({ user: req.user.id });
     const features = new APIFeatures(baseQuery, req.query).filter().sort().limitFields().paginate();
     const contracts = await features.query;
     
+
     res.status(200).json({
         status: "success",
         results: contracts.length,
+        totalCount,
         data: {
             data: contracts,
         },

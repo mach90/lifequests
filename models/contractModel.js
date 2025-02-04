@@ -22,6 +22,10 @@ const contractSchema = new mongoose.Schema(
             type: Date,
             default: Date.now()
         },
+        finishedAt: {
+            type: Date,
+            default: null
+        },
         status: {
             type: String,
             default: "active",
@@ -59,7 +63,7 @@ contractSchema.pre(/^find/, function(next){
         select: "name"
     });
     next();
-})
+});
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 CONTRACT MODEL

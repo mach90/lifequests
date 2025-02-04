@@ -13,7 +13,10 @@ exports.getAll = Model => catchAsync(async (req, res, next) => {
     let filter = {};
     if(req.params.questId) filter = {quest: req.params.questId};
 
-    const totalCount = await Model.countDocuments(filter);
+    // Créer une instance d'APIFeatures pour les filtres
+    const featuresForCount = new APIFeatures(Model.find(filter), req.query).filter();
+    // Utiliser la même query filtrée pour le count
+    const totalCount = await Model.countDocuments(featuresForCount.query._conditions);
 
     /* EXECUTING THE QUERY */
     const features = new APIFeatures(Model.find(filter), req.query).filter().sort().limitFields().paginate();

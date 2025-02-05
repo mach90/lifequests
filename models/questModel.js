@@ -26,9 +26,9 @@ const questSchema = new mongoose.Schema(
         difficulty: {
             type: String,
             required: [true, "A quest must have a difficulty level."],
-            enum: { //only for strings
-                values: ["easy", "medium", "difficult"],
-                message: "Difficulty is either: easy, medium, difficult."
+            enum: {
+                values: ["easy", "medium", "hard"],
+                message: "Difficulty is either: easy, medium, hard."
             }
         },
         summary: {
@@ -70,73 +70,73 @@ const questSchema = new mongoose.Schema(
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 stamina: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 dexterity: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 speed: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 vitality: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 agility: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 intelligence: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 charisma: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 wisdom: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 perception: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 focus: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
                 willpower: {
                     type: Number,
                     default: 0,
                     min: 0,
-                    max: 10
+                    max: 5
                 },
             },
         },

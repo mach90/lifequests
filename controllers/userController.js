@@ -105,6 +105,53 @@ exports.updateMe = catchAsync(async(req, res, next) => {
 });
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
+UPDATE MY CHARACTER (attributes, money, (skills?))
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.updateMyCharacter = catchAsync(async(req, res, next) => {
+    if(req.body.password || req.body.passwordConfirm || req.body.name || req.body.email ) {
+        return next(new AppError("This route is not for updating user or password, please use /updateMe or /updateMyPassword for that", 400));
+    }
+
+    // const filteredBody = filterObj(req.body, "money", "experience", "attributes");
+
+    // const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {new: true, runValidators: true});
+
+    // Create the update object with $inc operator
+    const updateObj = { $inc: {} };
+    
+    // Handle direct number fields (money, experience)
+    if (req.body.money) {
+        updateObj.$inc.money = req.body.money;
+    }
+    if (req.body.experience) {
+        updateObj.$inc.experience = req.body.experience;
+    }
+
+    // Handle nested attributes
+    if (req.body.attributes) {
+        for (const [key, value] of Object.entries(req.body.attributes)) {
+            updateObj.$inc[`attributes.${key}`] = value;
+        }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user.id, 
+        updateObj, 
+        {
+            new: true,
+            runValidators: true
+        }
+    );
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            user: updatedUser
+        }
+    });
+});
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
 DELETE ME (LOGGED IN USER)
 Will only set to inactive
 //////////////////////////////////////////////////////////////////////////////////////////////////// */

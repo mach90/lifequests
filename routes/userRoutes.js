@@ -2,7 +2,7 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const express = require("express"); //nodejs framework
-const {getAllUsers, getUser, patchUser, deleteUser, updateMe, deleteMe, getMe, uploadUserPhoto, resizeUserPhoto} = require("../controllers/userController");
+const {getAllUsers, getUser, patchUser, deleteUser, updateMe, deleteMe, getMe, uploadUserPhoto, resizeUserPhoto, updateMyCharacter} = require("../controllers/userController");
 const {signup, login, protect, forgotPassword, resetPassword, updatePassword, restrictTo, logout} = require("../controllers/authController");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
@@ -21,6 +21,7 @@ router.get("/me", protect, getMe, getUser);
 router.patch("/updateMyPassword", protect, updatePassword);
 router.patch("/updateMe", protect, uploadUserPhoto, resizeUserPhoto, updateMe);
 router.delete("/deleteMe", protect, deleteMe);
+router.patch("/updateMyCharacter", protect, updateMyCharacter);
 
 router.route("/")
     .get(protect, restrictTo("admin"), getAllUsers);

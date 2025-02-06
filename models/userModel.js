@@ -34,90 +34,90 @@ const userSchema = new mongoose.Schema(
             enum: ["user", "admin"],
             default: "user" 
         },
-        level: {
-            type: Number,
-            default: 1,
-            min:1,
-            max:200,
-        },
+        // level: {
+        //     type: Number,
+        //     default: 1,
+        //     min:1,
+        //     max:200,
+        // },
         experience: {
             type: Number,
             default: 0,
             min: 0,
-            max: 999999999,
+            max: 30225276,
         },
         attributes: {
             strength: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             stamina: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             dexterity: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             speed: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             vitality: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             agility: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             intelligence: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             charisma: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             wisdom: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             perception: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             focus: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
             willpower: {
                 type: Number,
                 default: 0,
                 min: 0,
-                max: 255
+                max: 100
             },
         },
         money: {
@@ -198,6 +198,66 @@ To not show inactive user in Get all users
 userSchema.pre(/^find/, function(next) {
     this.find({active: {$ne: false}});
     next();
+});
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+To cap values when updateMyCharacter uses findOneAndUpdate to inc character money, exp, attributes
+Ensures experience, money and attributes stay within their bounds even with $inc operations
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+userSchema.pre('findOneAndUpdate', function(next) {
+    const update = this.getUpdate();
+
+    if (update.$inc) {
+        this.model.findOne(this.getQuery())
+            .then(doc => {
+                if (!doc) return next();
+
+                // Handle experience
+                if (update.$inc.experience) {
+                    let newExp = (doc.experience || 0) + update.$inc.experience;
+                    if (newExp > 30225276) {
+                        update.$set = { ...update.$set, experience: 30225276 };
+                        delete update.$inc.experience;
+                    }
+                }
+
+                // Handle money
+                if (update.$inc.money) {
+                    let newMoney = (doc.money || 0) + update.$inc.money;
+                    if (newMoney < 0) {
+                        update.$set = { ...update.$set, money: 0 };
+                        delete update.$inc.money;
+                    }
+                }
+
+                // Handle attributes
+                if (update.$inc) {
+                    Object.keys(update.$inc).forEach(key => {
+                        if (key.startsWith('attributes.')) {
+                            const attrName = key.split('.')[1];
+                            const currentValue = doc.attributes[attrName] || 0;
+                            const increment = update.$inc[key];
+                            const newValue = currentValue + increment;
+
+                            if (newValue > 100) {
+                                update.$set = { ...update.$set, [key]: 100 };
+                                delete update.$inc[key];
+                            }
+                        }
+                    });
+                }
+
+                // If all $inc operations were converted to $set, remove $inc to avoid errors
+                if (Object.keys(update.$inc).length === 0) {
+                    delete update.$inc;
+                }
+
+                next();
+            })
+            .catch(err => next(err));
+    } else {
+        next();
+    }
 });
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████

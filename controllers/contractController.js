@@ -68,7 +68,7 @@ exports.getMyContract = catchAsync(async (req, res, next) => {
     });
 
     if (!contract) {
-        return next(new AppError('No contract found with that ID', 404));
+        return next(new AppError("No contract found with that ID", 404));
     }
 
     res.status(200).json({
@@ -112,7 +112,7 @@ exports.patchMyContract = catchAsync(async (req, res, next) => {
     );
 
     if (!contract) {
-        return next(new AppError('No contract found with that ID', 404));
+        return next(new AppError("No contract found with that ID", 404));
     }
 
     res.status(200).json({

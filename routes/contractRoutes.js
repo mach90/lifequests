@@ -28,5 +28,4 @@ router.route("/:id")
     .patch(protect, restrictTo("admin"), patchContract)
     .delete(protect, restrictTo("admin"), deleteContract);
 
-
 module.exports = router;

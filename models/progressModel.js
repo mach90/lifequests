@@ -26,14 +26,14 @@ const progressSchema = new mongoose.Schema(
             type: Number,
             default: 0,
             min: 0,
-            max: 999999999,
+            max: 30225276,
         },
-        level: {
-            type: Number,
-            default: 1,
-            min:1,
-            max:200,
-        },
+        // level: {
+        //     type: Number,
+        //     default: 1,
+        //     min:1,
+        //     max:200,
+        // },
     },
     {
         toJSON: { virtuals: true },

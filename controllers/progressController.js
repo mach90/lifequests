@@ -98,27 +98,30 @@ exports.createMyProgress = catchAsync(async (req, res, next) => {
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 PATCH MY PROGRESS
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.patchMyProgress = catchAsync(async (req, res, next) => {
-    const progress = await Progress.findOneAndUpdate(
-        {
-            _id: req.params.progressId,
-            user: req.user.id
-        },
-        req.body,
+exports.updateMyProgress = catchAsync(async (req, res, next) => {
+    const updateObj = { $inc: {} };
+
+    if (req.body.experience) {
+        updateObj.$inc.experience = req.body.experience;
+    }
+    
+    const updatedProgress = await Progress.findOneAndUpdate(
+        { _id: req.params.progressId }, // Utilisez l'ID de l'URL
+        updateObj,
         {
             new: true,
             runValidators: true
         }
     );
 
-    if(!progress) {
+    if (!updatedProgress) {
         return next(new AppError("No progress found with that ID", 404));
     }
 
     res.status(200).json({
         status: "success",
         data: {
-            data: progress
+            data: updatedProgress
         }
     });
 });

@@ -58,7 +58,37 @@ progressSchema.pre(/^find/, function(next){
         select: "name"
     });
     next();
-})
+});
+
+progressSchema.pre("findOneAndUpdate", function(next) {
+    const update = this.getUpdate();
+
+    if (update.$inc) {
+        this.model.findOne(this.getQuery())
+            .then(doc => {
+                if (!doc) return next();
+
+                // Handle experience
+                if (update.$inc.experience) {
+                    let newExp = (doc.experience || 0) + update.$inc.experience;
+                    if (newExp > 30225276) {
+                        update.$set = { ...update.$set, experience: 30225276 };
+                        delete update.$inc.experience;
+                    }
+                }
+
+                // If all $inc operations were converted to $set, remove $inc to avoid errors
+                if (Object.keys(update.$inc).length === 0) {
+                    delete update.$inc;
+                }
+
+                next();
+            })
+            .catch(err => next(err));
+    } else {
+        next();
+    }
+});
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 PROGRESS MODEL

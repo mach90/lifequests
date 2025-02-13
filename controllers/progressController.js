@@ -197,3 +197,28 @@ exports.updateOrCreateContractRelatedProgress = catchAsync(async (req, res, next
         }
     });
 });
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+GET MY GUILD'S PROGRESS
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.getGuildProgress = catchAsync(async (req, res, next) => {
+    const guild = await Guild.findById(req.params.guildId);
+
+    if (!guild) {
+        return next(new AppError("No guild found with that ID", 404));
+    }
+
+    const query = Progress.findOne({ 
+        guild: guild._id,
+        user: req.user.id
+    });
+
+    const progress = await query;
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            progress
+        }
+    });
+});

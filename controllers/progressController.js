@@ -3,9 +3,11 @@ REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const Progress = require("./../models/progressModel");
 const Guild = require("./../models/guildModel");
+const Quest = require("./../models/questModel");
+const Contract = require("./../models/contractModel");
 const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("./../utils/catchAsync");
-// const AppError = require("./../utils/appError");
+const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
@@ -122,6 +124,76 @@ exports.updateMyProgress = catchAsync(async (req, res, next) => {
         status: "success",
         data: {
             data: updatedProgress
+        }
+    });
+});
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+PATCH MANY OF MY PROGRESS
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.updateOrCreateContractRelatedProgress = catchAsync(async (req, res, next) => {
+    const { contractId } = req.params;
+    const { experience } = req.body;
+    const userId = req.user.id;
+
+    // First find the contract without population to get the quest ID
+    const contract = await Contract.findById(contractId);
+
+    if (!contract) {
+        return next(new AppError("No contract found with that ID", 404));
+    }
+
+    // Then find the quest directly with its guilds
+    const quest = await Quest.findById(contract.quest).select('guilds');
+
+    if (!quest) {
+        return next(new AppError("Contract is not associated with a quest", 400));
+    }
+
+    if (!quest.guilds || quest.guilds.length === 0) {
+        return next(new AppError("The quest does not belong to any guild", 400));
+    }
+
+    // Array to store the updated or created progress entries
+    const progressEntries = [];
+
+    // Loop through each guild ID and update/create progress
+    for (const guildId of quest.guilds) {
+        // Check if a progress entry already exists for the user and guild
+        let progress = await Progress.findOne({ 
+            user: userId, 
+            guild: guildId
+        });
+
+        if (progress) {
+            // If progress exists, use findOneAndUpdate with $inc for atomic operation
+            progress = await Progress.findOneAndUpdate(
+                { _id: progress._id },
+                { $inc: { experience: experience } },
+                { new: true, runValidators: true }
+            );
+        } else {
+            // If progress does not exist, create a new progress entry
+            progress = await Progress.create({
+                user: userId,
+                guild: guildId,
+                experience: experience
+            });
+        }
+
+        progressEntries.push(progress);
+    }
+
+    // Populate the guild information in the response
+    const populatedProgress = await Progress.populate(progressEntries, {
+        path: 'guild',
+        select: 'name'
+    });
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            data: populatedProgress
         }
     });
 });

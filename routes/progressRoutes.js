@@ -2,7 +2,7 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const express = require("express");
-const {getAllProgress, createProgress, getProgress, patchProgress, deleteProgress, getAllMyProgress, getMyProgress, createMyProgress, updateMyProgress} = require("../controllers/progressController");
+const {getAllProgress, createProgress, getProgress, patchProgress, deleteProgress, getAllMyProgress, getMyProgress, createMyProgress, updateMyProgress, updateOrCreateContractRelatedProgress} = require("../controllers/progressController");
 const {getMe} = require("../controllers/userController");
 const {protect, restrictTo} = require("../controllers/authController");
 
@@ -21,8 +21,10 @@ router.route("/my-progress")
 
 router.route("/my-progress/:progressId")
     .get(protect, restrictTo("admin", "user"),getMe, getMyProgress)
-    .patch(protect, restrictTo("admin", "user"),getMe, updateMyProgress)
+    .patch(protect, restrictTo("admin", "user"),getMe, updateMyProgress);
 
+router.route("/contract-related-progress/:contractId")
+    .patch(protect, restrictTo("admin", "user"), getMe, updateOrCreateContractRelatedProgress);
 
 router.route("/:id")
     .get(protect, restrictTo("admin"), getProgress)

@@ -26,7 +26,7 @@ const progressSchema = new mongoose.Schema(
             type: Number,
             default: 0,
             min: 0,
-            max: 30225276,
+            max: 10606601,
         },
         // level: {
         //     type: Number,
@@ -71,8 +71,8 @@ progressSchema.pre("findOneAndUpdate", function(next) {
                 // Handle experience
                 if (update.$inc.experience) {
                     let newExp = (doc.experience || 0) + update.$inc.experience;
-                    if (newExp > 30225276) {
-                        update.$set = { ...update.$set, experience: 30225276 };
+                    if (newExp > 10606601) {
+                        update.$set = { ...update.$set, experience: 10606601 };
                         delete update.$inc.experience;
                     }
                 }

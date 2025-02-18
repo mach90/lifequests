@@ -2,20 +2,29 @@ const nodemailer = require("nodemailer");
 
 module.exports = class Email {
     constructor(user, url) {
+        // Set the recipient's email address
         this.to = user.email;
+        // Extract the first part from the user's name
         this.firstName = user.name.split(" ")[0];
+        // Set the URL to be included in the email
         this.url = url;
+        // Set the sender's email address
         this.from = `LifeQuests <${process.env.EMAIL_FROM}>`;
     }
 
     newTransport() {
+        // Create a new transport instance using nodemailer
         return nodemailer.createTransport({
-            host: process.env.DEV_EMAIL_HOST,
-            port: process.env.DEV_EMAIL_PORT,
+            // Set the email host from environment variables
+            host: process.env.NODE_ENV === "production" ? process.env.PROD_EMAIL_HOST : process.env.DEV_EMAIL_HOST,
+            // Set the email port from environment variables
+            port: process.env.NODE_ENV === "production" ? process.env.PROD_EMAIL_PORT : process.env.DEV_EMAIL_PORT,
+            // Set the authentication details from environment variables
             auth: {
-                user: process.env.DEV_EMAIL_USERNAME,
-                pass: process.env.DEV_EMAIL_PASSWORD 
+                user: process.env.NODE_ENV === "production" ? process.env.PROD_EMAIL_USERNAME : process.env.DEV_EMAIL_USERNAME,
+                pass: process.env.NODE_ENV === "production" ? process.env.PROD_EMAIL_PASSWORD : process.env.DEV_EMAIL_PASSWORD,
             },
+            // Enable logging for the transport instance
             logger: true,
         });
     }
@@ -29,22 +38,46 @@ module.exports = class Email {
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                     <title>Welcome to LifeQuests</title>
                     <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f4f4;
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        p {
+                            color: #333;
+                            font-size: 16px;
+                            line-height: 1.5;
+                        }
                         .btn {
+                            display: inline-block;
                             background-color: #55c57a;
                             color: white;
-                            padding: 10px 20px;
+                            padding: 12px 20px;
                             text-decoration: none;
                             border-radius: 5px;
+                            font-size: 16px;
+                            font-weight: bold;
+                        }
+                        .container {
+                            max-width: 600px;
+                            background-color: #ffffff;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            margin: 0 auto;
                         }
                     </style>
                 </head>
                 <body>
-                    <p>Hi ${this.firstName},</p>
-                    <p>Welcome to LifeQuests, we're glad to have you 🎉🙏</p>
-                    <p>We're all a big family here, so make sure to upload your user photo so we get to know you better!</p>
-                    <p><a href="${this.url}" class="btn">Upload user photo</a></p>
-                    <p>If you need any help, please don't hesitate to contact us!</p>
-                    <p>- The LifeQuests Team</p>
+                    <div class="container">
+                        <p>Hello ${this.firstName},</p>
+                        <p>Welcome to LifeQuests. Your account has been successfully created.</p>
+                        <p>To personalize your experience, you can upload a profile avatar on your profile:</p>
+                        <p><a href="${this.url}" class="btn">Upload your avatar</a></p>
+                        <p>If you have any questions or need assistance, feel free to contact us.</p>
+                        <p><strong>The LifeQuests Team</strong></p>
+                    </div>
                 </body>
             </html>
         `;
@@ -52,17 +85,16 @@ module.exports = class Email {
 
     generateWelcomeText() {
         return `
-            Hi ${this.firstName},
+            Hello ${this.firstName},  
 
-            Welcome to LifeQuests, we're glad to have you! 🎉🙏
+            Welcome to LifeQuests. Your account has been successfully created.  
 
-            We're all a big family here, so make sure to upload your user photo so we get to know you better!
+            To personalize your experience, you can upload a profile photo on your profile:  
+            ${this.url}  
 
-            Upload your photo here: ${this.url}
+            If you have any questions or need assistance, feel free to contact us.
 
-            If you need any help, please don't hesitate to contact us!
-
-            - The LifeQuests Team
+            The LifeQuests Team
         `.trim();
     }
 
@@ -75,21 +107,45 @@ module.exports = class Email {
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                     <title>Password Reset</title>
                     <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f4f4;
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        p {
+                            color: #333;
+                            font-size: 16px;
+                            line-height: 1.5;
+                        }
                         .btn {
+                            display: inline-block;
                             background-color: #55c57a;
                             color: white;
-                            padding: 10px 20px;
+                            padding: 12px 20px;
                             text-decoration: none;
                             border-radius: 5px;
+                            font-size: 16px;
+                            font-weight: bold;
+                        }
+                        .container {
+                            max-width: 600px;
+                            background-color: #ffffff;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            margin: 0 auto;
                         }
                     </style>
                 </head>
                 <body>
-                    <p>Hi ${this.firstName},</p>
-                    <p>Forgot your password? Click the button below to reset it:</p>
-                    <p><a href="${this.url}" class="btn">Reset your password</a></p>
-                    <p>If you didn't request this, please ignore this email.</p>
-                    <p>- The LifeQuests Team</p>
+                    <div class="container">
+                        <p>Hello ${this.firstName},</p>
+                        <p>We received a request to reset your password for your LifeQuests account. If you made this request, please click the link below to set a new password:</p>
+                        <p><a href="${this.url}" class="btn">Reset your password</a></p>
+                        <p>If you did not request a password reset, you can safely ignore this email. Your account remains secure.</p>
+                        <p><strong>The LifeQuests Team</strong></p>
+                    </div>
                 </body>
             </html>
         `;
@@ -97,14 +153,15 @@ module.exports = class Email {
 
     generatePasswordResetText() {
         return `
-            Hi ${this.firstName},
+            Hello ${this.firstName},
 
-            Forgot your password? Use this link to reset it:
+            We received a request to reset your password for your LifeQuests account. If you made this request, please click the link below to set a new password:
+
             ${this.url}
 
-            If you didn't request this, please ignore this email.
+            If you did not request a password reset, you can safely ignore this email. Your account remains secure.
 
-            - The LifeQuests Team
+            The LifeQuests Team
         `.trim();
     }
 
@@ -124,7 +181,7 @@ module.exports = class Email {
         await this.send(
             this.generateWelcomeHTML(),
             this.generateWelcomeText(),
-            "Welcome to the LifeQuests family!"
+            "Welcome to LifeQuests - Your account has been created"
         );
     }
 
@@ -132,7 +189,7 @@ module.exports = class Email {
         await this.send(
             this.generatePasswordResetHTML(),
             this.generatePasswordResetText(),
-            "Your password reset token (valid for 10 min)"
+            "LifeQuests password reset request (valid for 10 minutes)"
         );
     }
 }

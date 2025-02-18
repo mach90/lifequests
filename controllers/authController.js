@@ -224,7 +224,8 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email.`;*/
     
     try {
-        const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
+        // const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
+        const resetURL = `http://localhost:5173/reset/${resetToken}`;
 
         await new Email(user, resetURL).sendPasswordReset();
     
@@ -262,12 +263,8 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     user.passwordConfirm = req.body.passwordConfirm;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
-    await user.save();
-
-    /* //////////////////////////////////////////////////
-    Update changedPasswordAt property for the current user
-    ////////////////////////////////////////////////// */
-    
+    user.passwordChangedAt = Date.now();
+    await user.save();   
 
     /* //////////////////////////////////////////////////
     Send jwt token to user and log the user in

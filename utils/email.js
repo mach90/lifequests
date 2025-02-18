@@ -19,6 +19,8 @@ module.exports = class Email {
             host: process.env.NODE_ENV === "production" ? process.env.PROD_EMAIL_HOST : process.env.DEV_EMAIL_HOST,
             // Set the email port from environment variables
             port: process.env.NODE_ENV === "production" ? process.env.PROD_EMAIL_PORT : process.env.DEV_EMAIL_PORT,
+            //Port587 for Brevo need secure fals
+            secure: false,
             // Set the authentication details from environment variables
             auth: {
                 user: process.env.NODE_ENV === "production" ? process.env.PROD_EMAIL_USERNAME : process.env.DEV_EMAIL_USERNAME,

@@ -225,7 +225,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     
     try {
         // const resetURL = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${resetToken}`;
-        const resetURL = `http://localhost:5173/reset/${resetToken}`;
+        const resetURL = `http://lifequests.netlify.app/reset/${resetToken}`;
 
         await new Email(user, resetURL).sendPasswordReset();
     

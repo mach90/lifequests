@@ -33,7 +33,7 @@ const skillSchema = new mongoose.Schema(
         },
         level: {
             type: Number,
-            required: [true, "A skill must have a level number."],
+            required: [true, "A skill must have a level."],
             enum: {
                 values: [1, 2, 3, 4, 5],
                 message: "Skill level is either: 1, 2, 3, 4, 5."

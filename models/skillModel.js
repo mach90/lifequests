@@ -23,6 +23,22 @@ const skillSchema = new mongoose.Schema(
             trim: true,
             required: [true, "A skill must have a description."]
         },
+        category: {
+            type: String,
+            required: [true, "A skill must have a category."],
+            enum: {
+                values: ["technical", "social", "physical", "fourth", "fifth"],
+                message: "Category is either: technical, social, physical, fourth, fifth."
+            }
+        },
+        level: {
+            type: Number,
+            required: [true, "A skill must have a level number."],
+            enum: {
+                values: [1, 2, 3, 4, 5],
+                message: "Skill level is either: 1, 2, 3, 4, 5."
+            }
+        },
         createdAt: {
             type: Date,
             default: Date.now(),

@@ -22,6 +22,8 @@ const questRouter = require("./routes/questRoutes");
 const guildRouter = require("./routes/guildRoutes");
 const contractRouter = require("./routes/contractRoutes");
 const progressRouter = require("./routes/progressRoutes");
+const skillRouter = require("./routes/skillRoutes");
+const skillsetRouter = require("./routes/skillsetRoutes");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
 EXPRESS APP
@@ -158,6 +160,8 @@ app.use("/api/v1/quests", questRouter);
 app.use("/api/v1/guilds", guildRouter);
 app.use("/api/v1/contracts", contractRouter);
 app.use("/api/v1/progress", progressRouter);
+app.use("/api/v1/skills", skillRouter);
+app.use("/api/v1/skillsets", skillsetRouter);
 
 app.get("/", (req, res) => {
   res.status(200).json({

@@ -1,0 +1,22 @@
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+REQUIRE
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+const express = require("express");
+const {getAllSkills, getSkill, createSkill, patchSkill, deleteSkill} = require("../controllers/skillController");
+const {protect, restrictTo} = require("../controllers/authController");
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+SKILL ROUTER
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+const router = express.Router();
+
+router.route("/")
+    .get(getAllSkills)
+    .post(protect, restrictTo("admin"), createSkill);
+
+router.route("/:id")
+    .get(getSkill)
+    .patch(protect, restrictTo("admin"), patchSkill)
+    .delete(protect, restrictTo("admin"), deleteSkill); 
+
+module.exports = router;

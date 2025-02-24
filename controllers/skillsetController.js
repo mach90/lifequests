@@ -1,123 +1,118 @@
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
-const Contract = require("./../models/contractModel");
+const Skillset = require("./../models/skillsetModel");
 const catchAsync = require("./../utils/catchAsync");
 const APIFeatures = require("./../utils/apiFeatures");
 const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
-CONTRACTS ROUTE HANDLERS
+MIDDLEWARES
+████████████████████████████████████████████████████████████████████████████████████████████████████ 
+*/
+
+/* ████████████████████████████████████████████████████████████████████████████████████████████████████
+SKILLSETS ROUTE HANDLERS
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-GET ALL CONTRACTS
+GET ALL SKILLSETS
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.getAllContracts = factory.getAll(Contract);
+exports.getAllSkillsets = factory.getAll(Skillset);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-GET CONTRACT BY ID
+GET SKILLSET BY ID
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.getContract = factory.getOne(Contract);
+exports.getSkillset = factory.getOne(Skillset);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-CREATE CONTRACT
+CREATE SKILLSET
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.createContract = factory.createOne(Contract);
+exports.createSkillset = factory.createOne(Skillset);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-PATCH CONTRACT
+PATCH SKILLSET
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.patchContract = factory.patchOne(Contract);
+exports.patchSkillset = factory.patchOne(Skillset);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-DELETE CONTRACT
+DELETE SKILLSET
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.deleteContract = factory.deleteOne(Contract);
+exports.deleteSkillset = factory.deleteOne(Skillset);
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-GET MY CONTRACTS
+CREATE MY SKILLSET
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.getMyContracts = catchAsync(async (req, res, next) => {
-    const baseQuery = Contract.find({ user: req.user.id });
-    
-    const featuresForCount = new APIFeatures(Contract.find({ user: req.user.id }), req.query).filter();
-    const totalCount = await Contract.countDocuments(featuresForCount.query._conditions);
+exports.createMySkillset = catchAsync(async (req, res, next) => {
+    req.body.user = req.user.id;
 
-    const features = new APIFeatures(baseQuery, req.query).filter().sort().limitFields().paginate();
-    const contracts = await features.query;
-    
-    res.status(200).json({
+    const newSkillset = await Skillset.create(req.body);
+
+    res.status(201).json({
         status: "success",
-        results: contracts.length,
-        totalCount,
         data: {
-            data: contracts,
-        },
+            data: newSkillset
+        }
     });
 });
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-GET MY CONTRACT BY ID
+GET MY SKILLSET
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.getMyContract = catchAsync(async (req, res, next) => {
-    const contract = await Contract.findOne({ 
-        _id: req.params.contractId,
-        user: req.user.id 
-    });
+exports.getMySkillset = catchAsync(async (req, res, next) => {
+    const skillset = await Skillset.findOne({ user: req.user.id });
 
-    if (!contract) {
-        return next(new AppError("No contract found with that ID", 404));
+    if (!skillset) {
+        return next(new AppError('No skillset found for this user', 404));
     }
 
     res.status(200).json({
         status: "success",
         data: {
-            data: contract
+            data: skillset
         }
     });
 });
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
-CREATE MY CONTRACT
+PATCH MY SKILLSET
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.createMyContract = catchAsync(async (req, res, next) => {
-    req.body.user = req.user.id;
+exports.patchMySkillset = catchAsync(async (req, res, next) => {
+    // Check if the request body contains skills
+    if (!req.body.skills || !Array.isArray(req.body.skills)) {
+        return next(new AppError('Please provide an array of skill IDs', 400));
+    }
 
-    const newContract = await Contract.create(req.body);
+    // // Validate that all provided IDs are valid ObjectIds
+    // const invalidIds = req.body.skills.some(id => !mongoose.Types.ObjectId.isValid(id));
+    // if (invalidIds) {
+    //     return next(new AppError('Invalid skill ID format', 400));
+    // }
 
-    res.status(201).json({
-        status: "success",
-        data: {
-            data: newContract
-        }
-    });
-});
-
-/* ////////////////////////////////////////////////////////////////////////////////////////////////////
-PATCH MY CONTRACT
-//////////////////////////////////////////////////////////////////////////////////////////////////// */
-exports.patchMyContract = catchAsync(async (req, res, next) => {
-    const contract = await Contract.findOneAndUpdate(
+    // Use $addToSet to add skills to the array (prevents duplicates)
+    const skillset = await Skillset.findOneAndUpdate(
+        { user: req.user.id },
         { 
-            _id: req.params.contractId,
-            user: req.user.id 
+            $addToSet: { 
+                skills: { 
+                    $each: req.body.skills 
+                } 
+            } 
         },
-        req.body,
         {
             new: true,
             runValidators: true
         }
     );
 
-    if (!contract) {
-        return next(new AppError("No contract found with that ID", 404));
+    if (!skillset) {
+        return next(new AppError('No skillset found for this user.', 404));
     }
 
     res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
-            data: contract
+            data: skillset
         }
     });
 });

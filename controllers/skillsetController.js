@@ -78,22 +78,14 @@ exports.getMySkillset = catchAsync(async (req, res, next) => {
 PATCH MY SKILLSET
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
 exports.patchMySkillset = catchAsync(async (req, res, next) => {
-    // Check if the request body contains skills
-    if (!req.body.skills || !Array.isArray(req.body.skills)) {
-        return next(new AppError('Please provide an array of skill IDs', 400));
+    if (!req.body.skills) {
+        return next(new AppError("Please provide an array of skill IDs", 400));
     }
 
-    // // Validate that all provided IDs are valid ObjectIds
-    // const invalidIds = req.body.skills.some(id => !mongoose.Types.ObjectId.isValid(id));
-    // if (invalidIds) {
-    //     return next(new AppError('Invalid skill ID format', 400));
-    // }
-
-    // Use $addToSet to add skills to the array (prevents duplicates)
     const skillset = await Skillset.findOneAndUpdate(
         { user: req.user.id },
         { 
-            $addToSet: { 
+            $addToSet: { //addToSet prevents duplicates
                 skills: { 
                     $each: req.body.skills 
                 } 

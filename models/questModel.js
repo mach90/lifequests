@@ -139,6 +139,10 @@ const questSchema = new mongoose.Schema(
                     max: 5
                 },
             },
+            skills: [{
+                type: mongoose.Schema.ObjectId,
+                ref: "Skill",
+            }],
         },
         guilds: [{
             type: mongoose.Schema.ObjectId,
@@ -171,6 +175,14 @@ questSchema.pre("save", function(next) {
     this.slug = slugify(this.name, { lower: true });
     next();
 }); 
+
+questSchema.pre(/^find/, function(next) {
+    this.populate({
+        path: "reward.skills",
+        select: "name"
+    });
+    next();
+});
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
 QUEST MODEL

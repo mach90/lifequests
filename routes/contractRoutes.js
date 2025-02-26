@@ -2,7 +2,7 @@
 REQUIRE
 ████████████████████████████████████████████████████████████████████████████████████████████████████ */
 const express = require("express");
-const {getAllContracts, createContract, getContract, patchContract, deleteContract, getMyContracts, getMyContract, createMyContract, patchMyContract} = require("../controllers/contractController");
+const {getAllContracts, createContract, getContract, patchContract, deleteContract, getMyContracts, getMyContract, createMyContract, patchMyContract, getMyContractsAfterDate} = require("../controllers/contractController");
 const {getMe} = require("../controllers/userController");
 const {protect, restrictTo} = require("../controllers/authController");
 
@@ -22,6 +22,9 @@ router.route("/my-contracts")
 router.route("/my-contracts/:contractId")
     .get(protect, restrictTo("admin", "user"), getMe, getMyContract)
     .patch(protect, restrictTo("admin", "user"), getMe, patchMyContract);
+
+router.route("/my-recent-contracts/:date")
+    .get(protect, restrictTo("admin", "user"), getMe, getMyContractsAfterDate); //ISO 8601 date format YYYY-MM-DD
 
 router.route("/:id")
     .get(protect, restrictTo("admin"), getContract)

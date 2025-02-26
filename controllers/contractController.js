@@ -6,6 +6,7 @@ const catchAsync = require("./../utils/catchAsync");
 const APIFeatures = require("./../utils/apiFeatures");
 const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
+const mongoose = require("mongoose");
 
 /* ████████████████████████████████████████████████████████████████████████████████████████████████████
 CONTRACTS ROUTE HANDLERS
@@ -119,5 +120,118 @@ exports.patchMyContract = catchAsync(async (req, res, next) => {
         data: {
             data: contract
         }
+    });
+});
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
+GET MY CONTRACTS FINISHED AFTER DATE YYYY-MM-DD
+For statistics
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.getMyContractsAfterDate = catchAsync(async (req, res, next) => {
+    const { date } = req.params;
+    
+    if (!date) {
+        return next(new AppError("Please provide a date", 400));
+    }
+    
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+
+    const baseQuery = Contract.find({ 
+        user: req.user.id,
+        finishedAt: { 
+            $gte: new Date(date), 
+            $lte: new Date()
+        }
+    });
+    
+    const features = new APIFeatures(baseQuery, req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+        
+    const contracts = await features.query;
+    
+    const totalCount = await Contract.countDocuments({
+        user: req.user.id,
+        finishedAt: { 
+            $gte: new Date(date), 
+            $lte: new Date()
+        }
+    });
+
+    const perDayStats = await Contract.aggregate([
+        {
+            $match: { 
+                user: userId,
+                finishedAt: { 
+                    $gte: new Date(date), 
+                    $lte: new Date()
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "quests",
+                localField: "quest",
+                foreignField: "_id",
+                as: "quest"
+            }
+        },
+        {
+            $unwind: "$quest"
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$finishedAt" } },
+                numContractsForThatDate: { $sum: 1 },
+                totalExperience: { $sum: "$quest.reward.experience" },
+                totalMoney: { $sum: "$quest.reward.money" }
+            }
+        },
+        {
+            $sort: { _id: 1 }
+        },
+    ]);
+
+    const averageStats = await Contract.aggregate([
+        {
+            $match: { 
+                user: userId,
+                finishedAt: { 
+                    $gte: new Date(date), 
+                    $lte: new Date()
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "quests",
+                localField: "quest",
+                foreignField: "_id",
+                as: "quest"
+            }
+        },
+        {
+            $unwind: "$quest"
+        },
+        {
+            $group: {
+                _id: null,
+                avgExperience: { $avg: "$quest.reward.experience" },
+                avgMoney: { $avg: "$quest.reward.money" }
+            }
+        },
+    ]);
+    
+    res.status(200).json({
+        status: "success",
+        results: contracts.length,
+        totalCount,
+        data: {
+            data: contracts,
+            perDayStats,
+            averageStats
+        },
     });
 });

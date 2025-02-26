@@ -60,7 +60,7 @@ contractSchema.pre(/^find/, function(next){
         select: "name"
     }).populate({
         path: "quest",
-        select: "name"
+        select: "name reward"
     });
     next();
 });

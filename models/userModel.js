@@ -34,12 +34,18 @@ const userSchema = new mongoose.Schema(
             enum: ["user", "admin"],
             default: "user" 
         },
-        // level: {
-        //     type: Number,
-        //     default: 1,
-        //     min:1,
-        //     max:200,
-        // },
+        settings: {
+            theme: {
+                type: String,
+                enum: ["system", "light", "dark"],
+                default: "dark"
+            },
+            displayExperience: {
+                type: String,
+                enum: ["classic", "remaining"],
+                default: "classic"
+            },
+        },
         experience: {
             type: Number,
             default: 0,

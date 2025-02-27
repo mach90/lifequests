@@ -105,6 +105,22 @@ exports.updateMe = catchAsync(async(req, res, next) => {
 });
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////
+UPDATE MY (APP) SETTINGS
+//////////////////////////////////////////////////////////////////////////////////////////////////// */
+exports.updateMySettings = catchAsync(async(req, res, next) => {
+    const filteredBody = filterObj(req.body, "settings"); //we only allow settings to be changed
+
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {new: true, runValidators: true});
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            user: updatedUser
+        }
+    });
+});
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////////
 UPDATE MY CHARACTER (attributes, money, (skills?))
 //////////////////////////////////////////////////////////////////////////////////////////////////// */
 exports.updateMyCharacter = catchAsync(async(req, res, next) => {

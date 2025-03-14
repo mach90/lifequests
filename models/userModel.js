@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
         settings: {
             theme: {
                 type: String,
-                enum: ["system", "light", "dark"],
+                enum: ["system", "light", "dark", "gray"],
                 default: "dark"
             },
             displayExperience: {
